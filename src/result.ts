@@ -213,6 +213,18 @@ export class Result<T, E extends ErrorBase> {
 		return !this.value.success ? Result.err(fn(this.value.error)) : Result.ok(this.value.data);
 	}
 
+	/**
+	 * Maps the Typescript type of the Result to a new type, without changing the underlying value.
+	 * This is useful for changing the error type when you know the underlying error is compatible.
+	 * 
+	 * @template NewType The new success type to map to
+	 * @template NewErr The new error type to map to
+	 * @returns A new Result with the same value but a different error type
+	 */
+	mapType<NewType, NewErr extends ErrorBase = E>(): Result<NewType, NewErr> {
+		return this as unknown as Result<NewType, NewErr>;
+	}	
+
 	// ============================================================================
 	// Monadic Operations
 	// ============================================================================
