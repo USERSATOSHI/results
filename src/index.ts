@@ -21,7 +21,7 @@ export function ok<T, E extends { kind: number } = never>(value: T): Ok<T, E> {
  * @param error - the error value to wrap
  * @returns an `Err<T, E>` instance
  */
-export function err<const K extends number,T = never, const E extends { kind: K } = never>(
+export function err<T = never, const E extends { kind: number } = never>(
 	error: E,
 ): Err<T, E> {
 	return new Err<T, E>(error);
