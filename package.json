@@ -1,20 +1,12 @@
 {
-	"name": "@yumi/results",
-	"version": "1.1.0",
-	"type": "module",
-	"module": "src/index.ts",
-	"main": "src/index.ts",
-	"scripts": {
-		"dev": "bun run src/index.ts",
-		"start": "bun run src/index.ts",
-		"test": "bun test",
-		"format": "bunx prettier . --write",
-		"check-format": "bunx prettier . --check",
-		"typecheck": "bunx tsc --noEmit"
-	},
-	"devDependencies": {
-		"@types/bun": "latest",
-		"@types/jest": "^30.0.0",
-		"typescript": "catalog:"
-	}
+  "name": "@usersatoshi/results",
+  "module": "src/index.ts",
+  "version": "2.0.0",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  }
 }
