@@ -45,16 +45,21 @@ describe("map / mapErr / match", () => {
 
 	it("mapErr transforms Err", async () => {
 		const e = new Err({ kind: 3, msg: "bad" });
-		const me = e.mapErr((err) => ({ kind: 99, info: err.msg }));
+		const me = e.mapErr((err) => {
+			return {
+				kind: 99,
+				msg: err.msg
+			}
+		});
 		expect(me.isErr()).toBe(true);
-		expect((me as Err<any, any>).error.kind).toBe(99);
+		expect(me.error.kind).toBe(99);
 
 		const mea = await e.mapErr(async (err) => ({
 			kind: 100,
 			info: err.msg,
 		}));
 		expect(mea.isErr()).toBe(true);
-		expect((mea as Err<any, any>).error.kind).toBe(100);
+		expect(mea.error.kind).toBe(100);
 	});
 
 	it("match picks correct branch", () => {
@@ -128,7 +133,7 @@ describe("static helpers all / any", () => {
 			new Err({ kind: 2 }),
 		] as any);
 		expect(any2.isErr()).toBe(true);
-		expect((any2 as Err<any, any>).error.kind).toBe(2);
+		expect(any2.error.kind).toBe(2);
 	});
 });
 
@@ -138,7 +143,7 @@ describe("helpers in src/index.ts", () => {
 		expect(o.isOk()).toBe(true);
 		expect(o.unwrap()).toBe(12);
 
-		const e = err<number, { kind: number }>({ kind: 9 });
+		const e = err({ kind: 9 });
 		expect(e.isErr()).toBe(true);
 	});
 

@@ -9,8 +9,8 @@ import type { Result } from "./types.ts";
  * @param value - the successful value to wrap
  * @returns an `Ok<T, E>` instance
  */
-export function ok<T, E extends { kind: number } = never>(value: T): Ok<T, E> {
-	return new Ok<T, E>(value);
+export function ok<T>(value: T): Ok<T> {
+	return new Ok<T>(value);
 }
 
 /**
@@ -21,10 +21,10 @@ export function ok<T, E extends { kind: number } = never>(value: T): Ok<T, E> {
  * @param error - the error value to wrap
  * @returns an `Err<T, E>` instance
  */
-export function err<T = never, const E extends { kind: number } = never>(
+export function err<const E extends { kind: number } = never>(
 	error: E,
-): Err<T, E> {
-	return new Err<T, E>(error);
+): Err<E> {
+	return new Err<E>(error);
 }
 
 /**
@@ -40,11 +40,11 @@ export function err<T = never, const E extends { kind: number } = never>(
 export async function fromPromise<T, E extends { kind: number }>(
 	promise: Promise<T>,
 	onErr: (error: unknown) => E,
-): Promise<Result<T, E>> {
+) {
 	try {
-		return ok<T, E>(await promise);
+		return ok<T>(await promise);
 	} catch (error) {
-		return err<T, E>(onErr(error));
+		return err(onErr(error));
 	}
 }
 
@@ -61,7 +61,7 @@ export async function fromPromise<T, E extends { kind: number }>(
 export async function fromAsync<T, E extends { kind: number }>(
 	fn: () => Promise<T>,
 	onErr: (error: unknown) => E,
-): Promise<Result<T, E>> {
+) {
 	return fromPromise(fn(), onErr);
 }
 
@@ -81,19 +81,19 @@ export async function fromAsync<T, E extends { kind: number }>(
 export function safeCall<T, E extends { kind: number }>(
 	fn: Promise<T>,
 	onErr: (error: unknown) => E,
-): Promise<Result<T, E>>;
+): Promise<Ok<T> | Err<E>>;
 export function safeCall<T, E extends { kind: number }>(
 	fn: () => T,
 	onErr: (error: unknown) => E,
-): Result<T, E>;
+): Ok<T> | Err<E>;
 export function safeCall<T, E extends { kind: number }>(
 	fn: () => Promise<T>,
 	onErr: (error: unknown) => E,
-): Promise<Result<T, E>>;
+): Promise<Ok<T> | Err<E>>;
 export function safeCall<T, E extends { kind: number }>(
 	fn: (() => T) | (() => Promise<T>) | Promise<T>,
 	onErr: (error: unknown) => E,
-): Result<T, E> | Promise<Result<T, E>> {
+) {
 	if (fn instanceof Promise) {
 		return fromPromise(fn, onErr);
 	}
@@ -104,9 +104,9 @@ export function safeCall<T, E extends { kind: number }>(
 			return fromPromise(result, onErr);
 		}
 
-		return ok<T, E>(result);
+		return ok<T>(result);
 	} catch (error) {
-		return err<T, E>(onErr(error));
+		return err<E>(onErr(error));
 	}
 }
 

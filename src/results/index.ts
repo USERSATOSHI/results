@@ -48,10 +48,10 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 		}
 		const values: T[] = [];
 		for (const result of results as Result<T, E>[]) {
-			if (result.isErr()) return new Err<T[], E>(result.error!);
+			if (result.isErr()) return new Err<E>(result.error!);
 			values.push(result.value!);
 		}
-		return new Ok<T[], E>(values);
+		return new Ok<T[]>(values);
 	}
 
 	/**
@@ -81,7 +81,7 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 			if (result.isOk()) return result;
 			lastErr = result.error;
 		}
-		return new Err<T, E>(lastErr!);
+		return new Err<E>(lastErr!);
 	}
 
 	/**
@@ -98,7 +98,7 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 		if (this.success && this.value !== undefined) {
 			return fn(this.value);
 		}
-		return new Err<U, E>(this.error!);
+		return new Err<E>(this.error!);
 	}
 
 	/**
@@ -118,7 +118,7 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 		if (!this.success && this.error !== undefined) {
 			return fn(this.error);
 		}
-		return new Ok<T, F>(this.value!);
+		return new Ok<T>(this.value!);
 	}
 
 	/**
@@ -134,11 +134,11 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 		if (this.success && this.value !== undefined) {
 			const result = fn(this.value);
 			if (result instanceof Promise) {
-				return result.then((v) => new Ok<U, E>(v));
+				return result.then((v) => new Ok<U>(v));
 			}
-			return new Ok<U, E>(result);
+			return new Ok<U>(result);
 		}
-		return new Err<U, E>(this.error!);
+		return new Err<E>(this.error!);
 	}
 
 	/**
@@ -156,11 +156,13 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 		if (!this.success && this.error !== undefined) {
 			const result = fn(this.error);
 			if (result instanceof Promise) {
-				return result.then((e) => new Err<T, F>(e));
+				return result.then((e) => new Err<F>(e));
 			}
-			return new Err<T, F>(result);
+			
+			return new Err<F>(result);
 		}
-		return new Ok<T, F>(this.value!);
+		
+		return new Ok<T>(this.value!);
 	}
 
 	/**
@@ -190,7 +192,7 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 	/**
 	 * Returns the success value, or `defaultValue` if this is an `Err`.
 	 */
-	unwrapOr(defaultValue: T): T {
+	unwrapOr<U>(defaultValue: U): T | U {
 		if (this.success && this.value !== undefined) {
 			return this.value;
 		}
@@ -200,14 +202,14 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 	/**
 	 * Type guard for narrowing to {@link Ok}.
 	 */
-	isOk(): this is Ok<T, E> {
+	isOk(): this is Ok<T> {
 		return this.success;
 	}
 
 	/**
 	 * Type guard for narrowing to {@link Err}.
 	 */
-	isErr(): this is Err<T, E> {
+	isErr(): this is Err<E> {
 		return !this.success;
 	}
 }
@@ -215,9 +217,9 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 /**
  * Successful `Result` variant.
  */
-export class Ok<T, E extends { kind: number } = never> extends BaseResult<
+export class Ok<T> extends BaseResult<
 	T,
-	E
+	never
 > {
 	readonly success = true as const;
 	override readonly error?: never;
@@ -232,7 +234,7 @@ export class Ok<T, E extends { kind: number } = never> extends BaseResult<
 /**
  * Failed `Result` variant.
  */
-export class Err<T, E extends { kind: number }> extends BaseResult<T, E> {
+export class Err<E extends { kind: number }> extends BaseResult<never, E> {
 	readonly success = false as const;
 	override readonly value?: never;
 	/**
