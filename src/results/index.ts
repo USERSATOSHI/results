@@ -90,8 +90,8 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 	 * If this is `Ok`, calls `fn` with the current value. If this is `Err`,
 	 * propagates the error unchanged.
 	 */
-	andThen<U>(fn: (value: T) => Promise<Result<U, E>>): Promise<Result<U, E>>;
 	andThen<U>(fn: (value: T) => Result<U, E>): Result<U, E>;
+	andThen<U>(fn: (value: T) => Promise<Result<U, E>>): Promise<Result<U, E>>;
 	andThen<U>(
 		fn: (value: T) => Result<U, E> | Promise<Result<U, E>>,
 	): Result<U, E> | Promise<Result<U, E>> {
@@ -106,19 +106,19 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 	 *
 	 * If this is `Ok`, the value is preserved.
 	 */
-	orElse<F extends { kind: number }>(
-		fn: (error: E) => Promise<Result<T, F>>,
-	): Promise<Result<T, F>>;
-	orElse<F extends { kind: number }>(
-		fn: (error: E) => Result<T, F>,
-	): Result<T, F>;
-	orElse<F extends { kind: number }>(
-		fn: (error: E) => Result<T, F> | Promise<Result<T, F>>,
-	): Result<T, F> | Promise<Result<T, F>> {
+	orElse<U, F extends { kind: number }>(
+		fn: (error: E) => Result<U, F>
+	): Result<U, F>;
+	orElse<U, F extends { kind: number }>(
+		fn: (error: E) => Promise<Result<U, F>>,
+	): Promise<Result<U, F>>;
+	orElse<U, F extends { kind: number }>(
+		fn: (error: E) => Result<U, F> | Promise<Result<U, F>>,
+	): Result<U, F> | Promise<Result<U, F>> {
 		if (!this.success && this.error !== undefined) {
 			return fn(this.error);
 		}
-		return new Ok<T>(this.value!);
+		return new Ok<U>(this.value! as unknown as U);
 	}
 
 	/**
@@ -158,10 +158,10 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 			if (result instanceof Promise) {
 				return result.then((e) => new Err<F>(e));
 			}
-			
+
 			return new Err<F>(result);
 		}
-		
+
 		return new Ok<T>(this.value!);
 	}
 
