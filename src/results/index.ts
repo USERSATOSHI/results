@@ -95,8 +95,8 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 	andThen<U>(
 		fn: (value: T) => Result<U, E> | Promise<Result<U, E>>,
 	): Result<U, E> | Promise<Result<U, E>> {
-		if (this.success && this.value !== undefined) {
-			return fn(this.value);
+		if (this.success) {
+			return fn(this.value as T);
 		}
 		return new Err<E>(this.error!);
 	}
@@ -115,8 +115,8 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 	orElse<U, F extends { kind: number }>(
 		fn: (error: E) => Result<U, F> | Promise<Result<U, F>>,
 	): Result<U, F> | Promise<Result<U, F>> {
-		if (!this.success && this.error !== undefined) {
-			return fn(this.error);
+		if (!this.success) {
+			return fn(this.error!);
 		}
 		return new Ok<U>(this.value! as unknown as U);
 	}
@@ -131,8 +131,8 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 	map<U>(
 		fn: (value: T) => U | Promise<U>,
 	): Result<U, E> | Promise<Result<U, E>> {
-		if (this.success && this.value !== undefined) {
-			const result = fn(this.value);
+		if (this.success) {
+			const result = fn(this.value as T);
 			if (result instanceof Promise) {
 				return result.then((v) => new Ok<U>(v));
 			}
@@ -153,8 +153,8 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 	mapErr<F extends { kind: number }>(
 		fn: (error: E) => F | Promise<F>,
 	): Result<T, F> | Promise<Result<T, F>> {
-		if (!this.success && this.error !== undefined) {
-			const result = fn(this.error);
+		if (!this.success) {
+			const result = fn(this.error!);
 			if (result instanceof Promise) {
 				return result.then((e) => new Err<F>(e));
 			}
@@ -169,8 +169,8 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 	 * Exhaustively handles both variants and returns a shared result type.
 	 */
 	match<U>(onOk: (value: T) => U, onErr: (error: E) => U): U {
-		if (this.success && this.value !== undefined) {
-			return onOk(this.value);
+		if (this.success) {
+			return onOk(this.value as T);
 		}
 		return onErr(this.error!);
 	}
@@ -181,8 +181,8 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 	 * @throws {@link ResultError} if called on an `Err`.
 	 */
 	unwrap(): T {
-		if (this.success && this.value !== undefined) {
-			return this.value;
+		if (this.success) {
+			return this.value as T;
 		}
 		throw new ResultError(
 			`Called unwrap on an Err: ${JSON.stringify(this.error)}`,
@@ -193,8 +193,8 @@ export abstract class BaseResult<T, E extends { kind: number }> {
 	 * Returns the success value, or `defaultValue` if this is an `Err`.
 	 */
 	unwrapOr<U>(defaultValue: U): T | U {
-		if (this.success && this.value !== undefined) {
-			return this.value;
+		if (this.success) {
+			return this.value as T;
 		}
 		return defaultValue;
 	}

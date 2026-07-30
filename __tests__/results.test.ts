@@ -77,6 +77,21 @@ describe("map / mapErr / match", () => {
 		);
 		expect(r2).toBe(7);
 	});
+
+	it("match handles an Ok containing undefined", () => {
+		const result = new Ok(undefined);
+		const matched = result.match(
+			() => "ok",
+			() => "err",
+		);
+
+		expect(matched).toBe("ok");
+		expect(result.unwrap()).toBeUndefined();
+		expect(result.unwrapOr("fallback")).toBeUndefined();
+		expect(result.map(() => "mapped").unwrap()).toBe("mapped");
+		expect(result.andThen(() => new Ok("chained")).unwrap()).toBe("chained");
+	});
+
 });
 
 describe("andThen / orElse chaining", () => {
