@@ -6,7 +6,7 @@
     "declarationMap": true,
     "sourceMap": true,
 
-	"rootDir": "./src",
+    "rootDir": "./src",
 
     // Environment setup & latest features
     "lib": ["ESNext"],

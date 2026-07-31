@@ -1,5 +1,4 @@
 import { Ok, Err } from "./results/index.ts";
-import type { Result } from "./types.ts";
 
 /**
  * Create an `Ok` result wrapping `value`.
@@ -10,7 +9,7 @@ import type { Result } from "./types.ts";
  * @returns an `Ok<T, E>` instance
  */
 export function ok<T>(value: T): Ok<T> {
-	return new Ok<T>(value);
+  return new Ok<T>(value);
 }
 
 /**
@@ -21,10 +20,8 @@ export function ok<T>(value: T): Ok<T> {
  * @param error - the error value to wrap
  * @returns an `Err<T, E>` instance
  */
-export function err<const E extends { kind: number } = never>(
-	error: E,
-): Err<E> {
-	return new Err<E>(error);
+export function err<const E extends { kind: number } = never>(error: E): Err<E> {
+  return new Err<E>(error);
 }
 
 /**
@@ -38,14 +35,14 @@ export function err<const E extends { kind: number } = never>(
  * @returns a `Promise<Result<T, E>>`
  */
 export async function fromPromise<T, E extends { kind: number }>(
-	promise: Promise<T>,
-	onErr: (error: unknown) => E,
+  promise: Promise<T>,
+  onErr: (error: unknown) => E,
 ) {
-	try {
-		return ok<T>(await promise);
-	} catch (error) {
-		return err(onErr(error));
-	}
+  try {
+    return ok<T>(await promise);
+  } catch (error) {
+    return err(onErr(error));
+  }
 }
 
 /**
@@ -59,10 +56,10 @@ export async function fromPromise<T, E extends { kind: number }>(
  * @returns a `Promise<Result<T, E>>`
  */
 export async function fromAsync<T, E extends { kind: number }>(
-	fn: () => Promise<T>,
-	onErr: (error: unknown) => E,
+  fn: () => Promise<T>,
+  onErr: (error: unknown) => E,
 ) {
-	return fromPromise(fn(), onErr);
+  return fromPromise(fn(), onErr);
 }
 
 /**
@@ -79,37 +76,36 @@ export async function fromAsync<T, E extends { kind: number }>(
  * @returns a `Result<T, E>` or `Promise<Result<T, E>>` depending on the input
  */
 export function safeCall<T, E extends { kind: number }>(
-	fn: Promise<T>,
-	onErr: (error: unknown) => E,
+  fn: Promise<T>,
+  onErr: (error: unknown) => E,
 ): Promise<Ok<T> | Err<E>>;
 export function safeCall<T, E extends { kind: number }>(
-	fn: () => T,
-	onErr: (error: unknown) => E,
+  fn: () => T,
+  onErr: (error: unknown) => E,
 ): Ok<T> | Err<E>;
 export function safeCall<T, E extends { kind: number }>(
-	fn: () => Promise<T>,
-	onErr: (error: unknown) => E,
+  fn: () => Promise<T>,
+  onErr: (error: unknown) => E,
 ): Promise<Ok<T> | Err<E>>;
 export function safeCall<T, E extends { kind: number }>(
-	fn: (() => T) | (() => Promise<T>) | Promise<T>,
-	onErr: (error: unknown) => E,
+  fn: (() => T) | (() => Promise<T>) | Promise<T>,
+  onErr: (error: unknown) => E,
 ) {
-	if (fn instanceof Promise) {
-		return fromPromise(fn, onErr);
-	}
+  if (fn instanceof Promise) {
+    return fromPromise(fn, onErr);
+  }
 
-	try {
-		const result = fn();
-		if (result instanceof Promise) {
-			return fromPromise(result, onErr);
-		}
+  try {
+    const result = fn();
+    if (result instanceof Promise) {
+      return fromPromise(result, onErr);
+    }
 
-		return ok<T>(result);
-	} catch (error) {
-		return err<E>(onErr(error));
-	}
+    return ok<T>(result);
+  } catch (error) {
+    return err<E>(onErr(error));
+  }
 }
 
-
 export * from "./results/index.ts";
-export * from './types.ts';
+export * from "./types.ts";

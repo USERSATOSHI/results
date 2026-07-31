@@ -1,18 +1,26 @@
 {
   "name": "@usersatoshi/results",
   "version": "1.0.1",
+  "description": "A Result type implementation for TypeScript",
+  "homepage": "https://github.com/usersatoshi/results",
+  "bugs": {
+    "url": "https://github.com/usersatoshi/results/issues"
+  },
+  "license": "Apache-2.0",
   "repository": {
     "type": "git",
     "url": "https://git.usersatoshi.com/usersatoshi/results.git"
   },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "type": "module",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
-  "devDependencies": {
-    "@types/bun": "latest"
-  },
-  "peerDependencies": {
-    "typescript": "^6"
-  },
+  "types": "./dist/esm/index.d.ts",
   "exports": {
     ".": {
       "import": {
@@ -25,29 +33,25 @@
       }
     }
   },
-  "bugs": {
-    "url": "https://github.com/usersatoshi/results/issues"
-  },
-  "description": "A Result type implementation for TypeScript",
-  "files": [
-    "dist",
-    "package.json",
-    "README.md",
-    "LICENSE"
-  ],
-  "homepage": "https://github.com/usersatoshi/results",
-  "license": "Apache-2.0",
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
     "build": "tsc && tsc -p tsconfig.cjs.json && echo '{\"type\":\"commonjs\"}' > dist/cjs/package.json",
     "prepublishOnly": "bun run build",
-	"docs": "typedoc --out docs src/index.ts"
+    "docs": "typedoc --out docs src/index.ts",
+    "format": "oxfmt --write package.json tsconfig.json tsconfig.cjs.json .oxfmtrc.json .oxlintrc.json src __tests__",
+    "format:check": "oxfmt --check package.json tsconfig.json tsconfig.cjs.json .oxfmtrc.json .oxlintrc.json src __tests__",
+    "lint": "oxlint --deny-warnings src __tests__",
+    "lint:fix": "oxlint --fix src __tests__"
   },
-  "type": "module",
-  "types": "./dist/esm/index.d.ts",
-  "dependencies": {
-    "typedoc": "^0.28.19"
+  "devDependencies": {
+    "@types/bun": "latest",
+    "oxfmt": "^0.61.0",
+    "oxlint": "^1.76.0",
+    "typedoc": "^0.28.20"
+  },
+  "peerDependencies": {
+    "typescript": "^6"
   }
 }
